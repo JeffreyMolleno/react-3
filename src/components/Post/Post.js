@@ -52,6 +52,8 @@ export default class Post extends Component {
   }
 
   render() {
+
+
     // This is destructuring! You can also think of it as being written as so:
     // const editing = this.state.editing
     // const showMasterMenu = this.state.showMasterMenu
@@ -70,7 +72,7 @@ export default class Post extends Component {
             style={{ display: showMasterMenu ? 'flex' : 'none' }}
           >
             <span onClick={this.showEdit}>Edit</span>
-            <span>Delete</span>
+            <span onClick={()=>this.props.deletePostfn(this.props.id)}>Delete</span>
           </div>
         </div>
 
@@ -83,7 +85,7 @@ export default class Post extends Component {
           <span className="Post__name">DevMountain</span>
           <span className="Post__handle">@DevMountain</span>
 
-          <span className="Post__date">- POST DATE GOES HERE</span>
+    <span className="Post__date">- {this.props.date}</span>
         </div>
 
         {/* This is where the text goes. Notice the turnary statement. The turnary statement decides to display either the text OR the editor view
@@ -97,9 +99,9 @@ export default class Post extends Component {
         <div className="Post__content">
           {// This has been pulled off of this.state via destructuring
           editing ? (
-            <Edit text="" hideEdit={this.hideEdit} />
+            <Edit updatePostfn ={this.props.updatePostfn} id={this.props.id} text="" hideEdit={this.hideEdit} text={this.props.text} />
           ) : (
-            <span className="Post__text">POST TEXT GOES HERE</span>
+          <span className="Post__text">{this.props.text}</span>
           )}
         </div>
 

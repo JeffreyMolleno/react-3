@@ -4,6 +4,12 @@ import './App.css';
 
 import Header from './Header/Header';
 import Compose from './Compose/Compose';
+import axios from 'axios'
+import Post from './Post/Post'
+
+
+// ???
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 class App extends Component {
   constructor() {
@@ -18,23 +24,105 @@ class App extends Component {
     this.createPost = this.createPost.bind(this);
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    axios.get('http://localhost:9090/posts')
+      .then(datas=>{
 
-  updatePost() {}
+        this.setState({
+          posts: datas.data
+        });
 
-  deletePost() {}
+      })
+      .catch(e=>{
+        console.log(e);
+      })
+  }
 
-  createPost() {}
+  updatePost(id, text) {
+
+    console.log(id, text)
+
+    axios.put(`http://localhost:9090/posts/${id}`, {text})
+      .then(response =>{
+        // this.setState({ post: Object.assign({},responce.data)});        
+        const updatedPost = response.data;
+
+        console.log("updated post" + updatedPost)
+
+        const updatedPosts = this.state.posts.map(post => {
+          if (post.id === updatedPost.id) {
+            return { post, ...updatedPost };
+          } else {
+            return post;
+          }
+        });
+  
+        this.setState({ posts: updatedPosts });
+      }).catch(e=>alert(e));
+
+      console.log(this.state);
+
+  }
+
+  deletePost(id) {
+    axios.delete(`http://localhost:9090/posts/${id}`).then(response =>{
+      this.setState({
+        posts: this.state.posts.filter(post => post.id !== id)
+      });
+    }).catch(e=>{
+      alert(e);
+    })
+  } 
+
+  createPost(text) {
+    axios.post('https://practiceapi.devmountain.com/api/posts', {text})
+      .then(results=>{
+
+        console.log(results.data);
+
+        this.setState({posts: results.data})
+      }).catch(e=>alert(e))
+  }
+
+  searchContent(text){
+    axios.get(`https://practiceapi.devmountain.com/api/posts/?q=${text}`)
+      .then(datas=>{
+
+        console.log("search" + datas[0].data)
+
+        this.setState({
+          posts: datas.data
+        });
+
+      })
+      .catch(e=>{
+        console.log(e);
+      })
+  }
 
   render() {
     const { posts } = this.state;
 
+   posts.map(post=>{
+     console.log("id" + post.id);
+   })
     return (
       <div className="App__parent">
-        <Header />
+        <Header searchContent={this.searchContent}/>
 
         <section className="App__content">
-          <Compose />
+          <Compose createPostFn={this.createPost} />
+        {
+
+          posts.map(post=>{
+            return <Post key={post.id}
+              id={post.id}
+             text={post.text} 
+             date={post.date}
+             updatePostfn={this.updatePost}
+             deletePostfn={this.deletePost}/>
+          })
+        }
         </section>
       </div>
     );
