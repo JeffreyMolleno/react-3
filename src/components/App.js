@@ -26,7 +26,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    axios.get('https://practiceapi.devmountain.com/api/posts')
+    axios.get('http://localhost:9090/posts/')
       .then(datas=>{
 
         this.setState({
